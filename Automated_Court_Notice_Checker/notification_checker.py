@@ -202,3 +202,153 @@ import re
 # notification = table.find(string = re.compile('March 3, 2022'))
 # print(notification)
 
+#Riverside County Homepage
+# r = requests.get('https://riverside.courts.ca.gov/GeneralInfo/MediaInfo/notices.php')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('table', attrs={'class': "basic-table"})
+# notification = table.find(string = re.compile('02/22/2022'))
+# print(notification)
+
+#Riverside County Covid
+# r = requests.get('https://riverside.courts.ca.gov/PublicNotices/COVID-19-Court-Operations.php')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('table', attrs={'id': "orders-table"})
+# notification = table.find(string = re.compile('02/21/2022'))
+# print(notification)
+
+#Sacramento County 
+# r = requests.get('https://www.saccourt.ca.gov/general/news-releases.aspx')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "row page-row"})
+# notification = table.find(string = re.compile('02.25.22'))
+# print(notification)
+
+#San Benito County
+# r = requests.get('https://www.sanbenito.courts.ca.gov/general-information/news-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('February 18, 2022'))
+# print(notification)
+
+#San Bernardino County
+# r = requests.get('https://www.sb-court.org/news-notice')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "views-element-container form-group"})
+# notification = table.find(string = re.compile('Mar 03, 2022'))
+# print(notification)
+
+#San Diego County
+# r = requests.get('https://www.sdcourt.ca.gov/news-release')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "views-element-container"})
+# notification = table.find(string = re.compile('March 3, 2022'))
+# print(notification)
+
+#San Luis Obispo County
+# r = requests.get('https://www.slo.courts.ca.gov/general-information/news-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('March 01, 2022'))
+# print(notification)
+
+#Santa Barbara County
+# r = requests.get('https://www.sbcourts.org/')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "simpleModule3"})
+# notification = table.find(string = re.compile('October 14, 2021'))
+# print(notification)
+
+#Santa Clara County Main News
+# r = requests.get('https://www.scscourt.org/general_info/news_media/policy_publicntc_news.shtml')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('body')
+# notification = table.find(string = re.compile('March 3, 2022'))
+# print(notification)
+
+#Santa Clara County Temp News
+# r = requests.get('https://www.scscourt.org/general_info/news_media/tempnews.shtml')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('body')
+# notification = table.find(string = re.compile('February 23, 2022'))
+# print(notification)
+
+#Santa Cruz County
+# r = requests.get('https://www.santacruz.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('February 25, 2022'))
+# print(notification)
+
+#Sierra County
+# r = requests.get('https://www.sierra.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('March 02, 2022'))
+# print(notification)
+
+#Siskiyou County
+# r = requests.get('https://www.siskiyou.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('March 01, 2022'))
+# print(notification)
+
+#Solano County
+# r = requests.get('https://solano.courts.ca.gov/administration/press-releases-public-notices/')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "col-lg-12"})
+# notification = table.find(string = re.compile('February 9, 2022'))
+# print(notification)
+
+#Stanislaus County
+# r = requests.get('https://www.stanct.org/')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "contentColumn"})
+# notification = table.find(string = re.compile('February 1, 2022'))
+# print(notification)
+
+#Sutter County
+# r = requests.get('https://www.sutter.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('July 09, 2021'))
+# print(notification)
+
+#Tehama County
+# r = requests.get('https://www.tehama.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('January 03, 2022'))
+# print(notification)
+
+#Tulare County
+# r = requests.get('https://www.tulare.courts.ca.gov/general-information/news')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('December 03, 2021'))
+# print(notification)
+
+#Ventura County
+# r = requests.get('http://www.ventura.courts.ca.gov/public-notice.html')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('div', attrs={'class': "simpleModuleX"})
+# notification = table.find(string = re.compile('January 3, 2022'))
+# print(notification)
+
+#Yolo County
+# r = requests.get('https://www.yolo.courts.ca.gov/general-information/local-rules-news-notices-orders-and-policies')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('Mar 02, 2022'))
+# print(notification)
+
+#Yuba County
+# r = requests.get('https://www.yuba.courts.ca.gov/general-information/news-and-events')
+# soup = bs(r.content, features="lxml")
+# table = soup.find('ul', attrs={'class': "jcc-news-listing__items"})
+# notification = table.find(string = re.compile('January 04, 2022'))
+# print(notification)
+
+
+
+
