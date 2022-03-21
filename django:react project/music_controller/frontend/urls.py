@@ -1,8 +1,11 @@
 from django.urls import path
 from .views import index
 
+app_name = 'frontend'
+
 urlpatterns = [
-    path('', index),
+    #have to name a path in order to use redirect (spotify>views.py)
+    path('', index, name=''),
     path('join', index),
     path('create', index),
     path('join/1', index),
