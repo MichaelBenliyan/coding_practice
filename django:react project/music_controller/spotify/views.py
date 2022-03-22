@@ -1,12 +1,11 @@
-from urllib import response
-from django import views
-from django.shortcuts import redirect, render, redirect
+from django.shortcuts import redirect, render
 from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID
 from rest_framework.views import  APIView
 from requests import Request, post
 from rest_framework import status
 from rest_framework.response import Response
-from .util import is_spotify_authenticated, update_or_create_user_tokens
+from .util import *
+from api.models import Room
 
 class AuthURL(APIView): 
     def get(self, request, format=None): 
@@ -31,7 +30,7 @@ def spotify_callback(request, format=None):
         'redirect_uri': REDIRECT_URI, 
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET
-        }).json()
+    }).json()
     
     access_token = response.get('access_token')
     token_type = response.get('token_type')
@@ -43,8 +42,7 @@ def spotify_callback(request, format=None):
         request.session.create()
     
     update_or_create_user_tokens(
-        request.session.session_key, access_token, token_type, expires_in, refresh_token
-    )
+        request.session.session_key, access_token, token_type, expires_in, refresh_token)
     #if you want to redirect to a different applcation you put a colon after the app name can also add a specific page after the colon 
     return redirect('frontend:')
 
@@ -52,4 +50,48 @@ class IsAuthenticated(APIView):
     def get(self, request, format=None): 
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status':is_authenticated}, status=status.HTTP_200_OK)
+    
+class CurrentSong(APIView): 
+    def get(self, request, format=None): 
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)
+        if room.exists(): 
+            room = room[0]
+        else: 
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        host = room.host
+        endpoint = "player/currently-playing"
+        response = execute_spotify_api_request(host, endpoint)
+        
+        if 'error' in response or 'item' not in response: 
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        
+        item = response.get('item')
+        duration = item.get('duration_ms')
+        progress = response.get('progress_ms')
+        album_cover = item.get('album').get('images')[0].get('url')
+        is_playing = response.get('is_playing')
+        song_id = item.get('id')
+        artist_string = ""
+        
+        for i, artist in enumerate(item.get('artists')): 
+            if i > 0: 
+                artist_string += ", "
+            name = artist.get('name')
+            artist_string += name
+        
+        song = {
+            'title': item.get('name'),
+            'artist': artist_string,
+            'duration': duration, 
+            'time': progress,
+            'image_url': album_cover, 
+            'is_playing': is_playing, 
+            'votes': 0, 
+            'id': song_id
+        }
+        
+        
+        return Response(song, status=status.HTTP_200_OK)
+        
 
