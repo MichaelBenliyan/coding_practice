@@ -17,20 +17,25 @@ FINISH_LINE = pygame.image.load("images/finish_line.png")
 FINISH_LINE_POSITION = (37, 300)
 bg_images = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH_LINE, FINISH_LINE_POSITION)]
 
+
 '''Masks for Pixel Perfect Collisions'''
 FINISH_LINE_MASK = pygame.mask.from_surface(FINISH_LINE)
 TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER)
+
 
 '''Interactive Windows'''
 MAIN_MENU = pygame.image.load("images/main_menu.png")
 WIN_SCREEN = pygame.image.load("images/win_screen.png")
 LOSE_SCREEN = pygame.image.load("images/lose_screen.png")
+END_SCREEN = pygame.image.load("images/end_screen.png")
+
 
 '''Countdown Graphics'''
 COUNTDOWN_3 = pygame.image.load("images/countdown_3.png")
 COUNTDOWN_2 = pygame.image.load("images/countdown_2.png")
 COUNTDOWN_1 = pygame.image.load("images/countdown_1.png")
 COUNTDOWN_GO = pygame.image.load("images/countdown_go.png")
+
 
 '''Cars Images'''
 PLAYER_CAR = scale_image(pygame.image.load("images/convertable_car.png"), 0.75)
@@ -160,84 +165,20 @@ class AICar(AbstractCar):
         elif right: 
             self.angle -= self.rot_velocity
     
-    def radar_forward(self, angle, window): 
+    def radar(self, radar_angle): 
         length = 0
         x = int(self.x)
         y = int(self.y)
-        angle = (angle+360)%360
-
+        #Keep moving in the radar_angle direction until hitting a nontrasparent pixel in the Track Border
         while length < 200 and not TRACK_BORDER.get_at((round(x), round(y)))[3] != 0:  
             length += 1
-            x = x - math.sin(math.radians(self.angle))
-            y = y - math.cos(math.radians(self.angle))
+            x = x - math.sin(math.radians(self.angle+radar_angle))
+            y = y - math.cos(math.radians(self.angle+radar_angle))
         
-        # pygame.draw.line(window, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
-        # pygame.draw.circle(window, (0, 255, 0), (x, y), 3)
-        # pygame.display.update()
-        return length
-
-    def radar_right(self, angle, window): 
-        length = 0
-        x = int(self.x)
-        y = int(self.y)
-        angle = (angle+360)%360
-
-        while length < 200 and not TRACK_BORDER.get_at((round(x), round(y)))[3] != 0:  
-            length += 1
-            x = x - math.sin(math.radians(self.angle-90))
-            y = y - math.cos(math.radians(self.angle-90))
-        
-        # pygame.draw.line(window, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
-        # pygame.draw.circle(window, (0, 255, 0), (x, y), 3)
-        # pygame.display.update()
-        return length
-
-    def radar_left(self, angle, window): 
-        length = 0
-        x = int(self.x)
-        y = int(self.y)
-        angle = (angle+360)%360
-
-        while length < 200 and not TRACK_BORDER.get_at((round(x), round(y)))[3] != 0: 
-            length += 1
-            x = x - math.sin(math.radians(self.angle+90))
-            y = y - math.cos(math.radians(self.angle+90))
-        
-        # pygame.draw.line(window, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
-        # pygame.draw.circle(window, (0, 255, 0), (x, y), 3)
-        # pygame.display.update()
-        return length
-    
-    def radar_forwardleft(self, angle, window): 
-        length = 0
-        x = int(self.x)
-        y = int(self.y)
-        angle = (angle+360)%360
-
-        while length < 200 and not TRACK_BORDER.get_at((round(x), round(y)))[3] != 0: 
-            length += 1
-            x = x - math.sin(math.radians(self.angle+45))
-            y = y - math.cos(math.radians(self.angle+45))
-        
-        # pygame.draw.line(window, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
-        # pygame.draw.circle(window, (0, 255, 0), (x, y), 3)
-        # pygame.display.update()
-        return length
-
-    def radar_forwardright(self, angle, window): 
-        length = 0
-        x = int(self.x)
-        y = int(self.y)
-        angle = (angle+360)%360
-
-        while length < 200 and not TRACK_BORDER.get_at((round(x), round(y)))[3] != 0: 
-            length += 1
-            x = x - math.sin(math.radians(self.angle-45))
-            y = y - math.cos(math.radians(self.angle-45))
-        
-        # pygame.draw.line(window, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
-        # pygame.draw.circle(window, (0, 255, 0), (x, y), 3)
-        # pygame.display.update()
+        '''Show Radars'''
+        pygame.draw.line(WINDOW, (0, 0, 0), (self.x, self.y), (round(x), round(y)), 1)
+        pygame.draw.circle(WINDOW, (0, 255, 0), (x, y), 3)
+        pygame.display.update()
         return length
         
 class GameInfo: 
@@ -313,12 +254,13 @@ def run_main_menu(genomes, config):
     while main_menu: 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
-                game = False
+                main_menu = False
                 pygame.quit()
                 quit()
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a: 
                     print(pygame.mouse.get_pos())
+
         '''Menu Options'''
         mouse = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:  
@@ -346,20 +288,17 @@ def run_setup(genomes, config, difficulty):
     game_info = GameInfo(difficulty)
     
     '''Setup Player Car'''
-    player_car = (PlayerCar(game_info.difficulty, game_info.level))      #FIX 
-    print(player_car.velocity)
+    player_car = (PlayerCar(game_info.difficulty, game_info.level)) 
 
     '''Setup AI Car'''
     net = neat.nn.FeedForwardNetwork.create(genomes[0][1], config)
     ai_car = (AICar(difficulty, game_info.level))
-    print(ai_car.velocity)
 
     run_countdown(genomes, config, game_info, player_car, ai_car, net)
 
 def run_countdown(genomes, config, game_info, player_car, ai_car, net): 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: 
-            game = False
             pygame.quit()
             quit()
         elif event.type == pygame.KEYDOWN: 
@@ -434,17 +373,16 @@ def run_game(genomes, config, game_info, player_car, ai_car, net):
         move_player(player_car)
         
         '''Distance Radars for AI'''
-        #Send out 5 radars so the car knows distance from itself to walls
-        distance_forward = ai_car.radar_forward(ai_car.angle, WINDOW)
-        distance_right = ai_car.radar_right(ai_car.angle, WINDOW)
-        distance_left = ai_car.radar_left(ai_car.angle, WINDOW)
-        distance_forwardleft = ai_car.radar_forwardleft(ai_car.angle, WINDOW)
-        distance_forwardright = ai_car.radar_forwardright(ai_car.angle, WINDOW)
-                
+        #Send out 5 radars so the AI knows distance from itself to walls
+        radar_angles = [0, -90, 90, 45, -45]
+        radars = [0, 0, 0, 0, 0]
+        for i, radar_angle in enumerate(radar_angles): 
+            radars[i] = ai_car.radar(radar_angle)
+
         '''NEAT Inputs (What information NEAT will have to make decisions)'''
         #Passing in 5 distance rays and the cars angle
-        output = net.activate((distance_forward, distance_left, distance_right, distance_forwardleft, distance_forwardright, (ai_car.angle+360)%360))
-        
+        output = net.activate((radars[0], radars[1], radars[2], radars[3], radars[4], (ai_car.angle+360)%360))
+
         '''NEAT Outputs aka AI controling car options'''
         if output[0] > 0: 
             ai_car.rotate(right=True)
@@ -484,7 +422,7 @@ def run_lose_screen(genomes, config, game_info, player_car, ai_car, net):
     while lose_screen: 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
-                game = False
+                lose_screen = False
                 pygame.quit()
                 quit()
             elif event.type == pygame.KEYDOWN: 
@@ -516,7 +454,7 @@ def run_win_screen(genomes, config, game_info, player_car, ai_car, net):
     while win_screen: 
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
-                game = False
+                win_screen = False
                 pygame.quit()
                 quit()
             elif event.type == pygame.KEYDOWN: 
@@ -535,6 +473,8 @@ def run_win_screen(genomes, config, game_info, player_car, ai_car, net):
             elif 312 <= mouse[0] <= 396 and 449<= mouse[1] <=483:
                 '''Next Level'''
                 game_info.next_level()
+                if game_info.level > game_info.levels: 
+                    run_end_screen(genomes, config)
                 player_car.reset(game_info.difficulty, game_info.level)
                 ai_car.reset(game_info.difficulty, game_info.level)
                 run_countdown(genomes, config, game_info, player_car, ai_car, net)
@@ -546,7 +486,38 @@ def run_win_screen(genomes, config, game_info, player_car, ai_car, net):
                 run_main_menu(genomes, config)
                 win_screen = False
                 break
- 
+
+def run_end_screen(genomes, config): 
+    WINDOW.blit(GRASS, (0,0))
+    WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
+    WINDOW.blit(END_SCREEN, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
+    pygame.display.update()    
+    end_screen = True
+    while end_screen: 
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT: 
+                end_screen = False
+                pygame.quit()
+                quit()
+            elif event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_a: 
+                    print(pygame.mouse.get_pos())
+
+        '''End Screen Options'''
+        mouse = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:  
+            if 228 <= mouse[0] <= 312 and 449<= mouse[1] <=483:
+                '''Main Menu'''  
+                run_main_menu(genomes, config)
+                end_screen = False
+                break
+            elif 394 <= mouse[0] <= 478 and 449<= mouse[1] <=483:
+                '''Quit'''
+                end_screen = False
+                pygame.quit()
+                quit()
+
 
 '''Play_Game'''
 def play_game(config_path, genome_path="Prev_Winners/20_92__5_2_0042.pkl"):
@@ -563,7 +534,7 @@ def play_game(config_path, genome_path="Prev_Winners/20_92__5_2_0042.pkl"):
     # Call game with only the loaded genome
     run_main_menu(genomes, config)
 
-
+'''Main Call'''
 if __name__ == "__main__": 
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "feed_forward_config.txt") 
