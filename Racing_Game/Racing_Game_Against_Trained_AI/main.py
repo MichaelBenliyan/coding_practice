@@ -50,20 +50,14 @@ class AbstractCar:
         self.mask = None
         self.max_velocity = max_velocity
         self.rot_velocity = rot_velocity
-        self.velocity = 0
-        self.acceleration = 0.2
+        self.velocity = max_velocity
+        self.acceleration = max_velocity/30
         self.angle = 0
         self.x, self.y = self.START_POSITION
         self.cur_x, self.cur_y = self.x, self.y
         self.prev_x, self.prev_y = 0, 0
         self.time_since_bounce = 0
         self.laptime = 0
-
-    def rotate(self, left=False, right=False): 
-        if left: 
-            self.angle += self.rot_velocity/2
-        elif right: 
-            self.angle -= self.rot_velocity
 
     def draw(self, window): 
         result = blit_rotate_center(window, self.image, (self.x, self.y), self.angle)
@@ -102,18 +96,27 @@ class AbstractCar:
 class PlayerCar(AbstractCar): 
     IMAGE = PLAYER_CAR
     START_POSITION = (75, 250)
-    SPEEDS = [(3, 3), (4, 4), (5, 4), (6, 4), (7,4)]
-
+    SPEEDS = [(1, 10), (1.5, 4), (2, 4), (2.5, 6), (3, 6)]
+    level = 0
+    # max_velocity = SPEEDS[level][0]
+    # rot_velocity = SPEEDS[level][1]
     def reset(self, level): 
         super().reset()
         self.max_velocity = self.SPEEDS[level][0]
         self.rot_velocity = self.SPEEDS[level][1]
+
+    def rotate(self, left=False, right=False): 
+        if left: 
+            self.angle += self.rot_velocity
+        elif right: 
+            self.angle -= self.rot_velocity
 
     def reduce_speed(self): 
         if self.velocity < 0: 
             self.velocity = max(self.velocity+self.acceleration, -self.max_velocity)
         else: 
             self.velocity = max(self.velocity - self.acceleration, 0)
+        print(self.velocity)
         self.move()
 
     def bounce(self): 
@@ -126,18 +129,21 @@ class PlayerCar(AbstractCar):
 class AICar(AbstractCar): 
     IMAGE = AI_CAR
     START_POSITION = (85, 250)
-    SPEEDS = [(3, 3), (4, 4), (5, 4), (6, 4), (7,4)]
-
     def reset(self, level): 
         super().reset()
-        self.max_velocity = self.SPEEDS[level][0]
-        self.rot_velocity = self.SPEEDS[level][1]
+        
 
     def reduce_speed(self): 
         self.velocity = max(self.velocity - self.acceleration, 0)
         if self.velocity < 0: 
             self.velocity = max(self.velocity+self.acceleration, -self.max_velocity)
         self.move()
+
+    def rotate(self, left=False, right=False): 
+        if left: 
+            self.angle += self.rot_velocity/2
+        elif right: 
+            self.angle -= self.rot_velocity
 
     def bounce(self): 
         if self.velocity <= 0: 
@@ -269,7 +275,7 @@ def draw(window, images, ai_car, game_info, player_car=None, ):
     ai_car.draw(window)
     pygame.display.update()
 
-def move_player(player_car, time_since_bounce=0): 
+def move_player(player_car): 
     keys = pygame.key.get_pressed()
     moved = False
     if player_car.time_since_bounce > 10:
@@ -287,24 +293,8 @@ def move_player(player_car, time_since_bounce=0):
     if not moved: 
         player_car.reduce_speed()
 
-
-'''Main Game Function'''
-def run_genomes(genomes, config):
+def main_menu(genomes, config): 
     
-    '''Setup AI Car'''
-    net = neat.nn.FeedForwardNetwork.create(genomes[0][1], config)
-    ai_car = (AICar(2.7, 6))
-
-    '''Setup Player Car'''
-    player_car = (PlayerCar(3, 6))
-
-    '''Game Details'''
-    game_info = GameInfo()
-    clock = pygame.time.Clock()
-    FPS = 60
-    run = True
-    time_since_bounce = 0
-
     '''Start Menu'''
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
@@ -323,11 +313,101 @@ def run_genomes(genomes, config):
         mouse = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:  
             if 196 <= mouse[0] <= 279 and 449<= mouse[1] <=483:
-                print("Easy")     
+                print("Easy")  
+                difficulty = 0.5
+                run_genomes(genomes, config, difficulty)
+                pygame.quit()
+                quit()
             elif 312 <= mouse[0] <= 396 and 449<= mouse[1] <=483:
                 print("Medium")
+                difficulty = 0.35
+                run_genomes(genomes, config, difficulty)
+                pygame.quit()
+                quit()
             elif 426 <= mouse[0] <= 510 and 449<= mouse[1] <=483:
                 print("Hard")
+                difficulty = 0.20
+                run_genomes(genomes, config, difficulty)
+                pygame.quit()
+                quit()
+
+def lose_screen(genomes, config, difficulty, player_car, ai_car):
+    pass
+
+def win_screen(genomes, config, difficulty, player_car, ai_car): 
+    '''Win Screen'''
+    WINDOW.blit(GRASS, (0,0))
+    WINDOW.blit(TRACK, (0,0))
+    #display GOOD JOB!
+    # WINDOW.blit(MAIN_MENU, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
+    pygame.display.update()
+    win_screen = True
+    while win_screen: 
+        for event in pygame.event.get(): 
+            if event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_q:
+                    win_screen = False
+                    break
+                elif event.key == pygame.K_a: 
+                    print(pygame.mouse.get_pos())
+        
+        mouse = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:  
+            if 196 <= mouse[0] <= 279 and 449<= mouse[1] <=483:
+                '''Repeat Level'''  
+                player_car.reset()
+                ai_car.reset()
+                countdown(genomes, config, difficulty, player_car, ai_car)
+                pygame.quit()
+                quit()
+            elif 312 <= mouse[0] <= 396 and 449<= mouse[1] <=483:
+                '''Next Level'''
+                player_car.reset()
+                ai_car.reset()
+                countdown(genomes, config, difficulty, player_car, ai_car)
+                pygame.quit()
+                quit()
+            elif 426 <= mouse[0] <= 510 and 449<= mouse[1] <=483:
+                '''Main Menu'''
+                main_menu(genomes, config)
+                pygame.quit()
+                quit()
+    pass 
+
+'''Main Game Function'''
+def run_genomes(genomes, config, difficulty):
+    
+    '''Setup Player Car'''
+    player_car = (PlayerCar(1, 2))
+    print(player_car.velocity)
+    '''Setup AI Car'''
+    net = neat.nn.FeedForwardNetwork.create(genomes[0][1], config)
+    ai_car = (AICar(0.85, 2))
+    print(ai_car.velocity)
+
+    '''Game Details'''
+    game_info = GameInfo()
+    clock = pygame.time.Clock()
+    FPS = 60
+    run = True
+    countdown = FPS*3 + 20
+    while countdown > 0: 
+        while countdown > countdown - FPS: 
+            clock.tick(FPS) 
+            countdown -= 1
+            # display 3
+        while countdown > countdown - FPS*2:
+            clock.tick(FPS) 
+            countdown -= 1
+            #display 2 
+        while countdown > countdown - FPS*3: 
+            clock.tick(FPS) 
+            countdown -= 1
+            #display 1
+        clock.tick(FPS)
+        countdown -= 1
+        #display GO!
+
     
     '''Main Game / Event Loop'''
     while run:
@@ -367,7 +447,7 @@ def run_genomes(genomes, config):
         #Car is always moving forward and turning left, AI only controls when to turn right. 
         ai_car.move_forward()
         ai_car.rotate(left=True)
-        move_player(player_car, time_since_bounce)
+        move_player(player_car)
         
         '''Distance Radars for AI'''
         #Send out 5 radars so the car knows distance from itself to walls
@@ -394,8 +474,10 @@ def run_genomes(genomes, config):
             #if from the correct side
             if ai_finish_line_poi_collide[1] != 0:  
                 print("You Lost")
-                ai_car = None
-                pass
+                lose_screen(genomes, config, difficulty, player_car, ai_car)
+                run = False
+                pygame.quit()
+                quit()
         
         #If player hit Wall/Finish
         if player_car.time_since_bounce > 10:
@@ -407,6 +489,10 @@ def run_genomes(genomes, config):
                     player_car.bounce()
                     player_car.time_since_bounce = 0
                 else: 
+                    win_screen(genomes, config, difficulty, player_car, ai_car)
+                    run = False
+                    pygame.quit()
+                    quit()
                     blit_text_center(WINDOW, HEADER_FONT, "You Won!")
                     blit_text_abovecenter(WINDOW, SUBHEADER_FONT, f"LapTime: {game_info.get_level_time()}s")
                     blit_text_subcenter(WINDOW, SUBHEADER_FONT, f"TopSpeed: {player_car.top_speed}px/s")
@@ -443,7 +529,7 @@ def play_game(config_path, genome_path="Prev_Winners/20_92__5_2_0042.pkl"):
     genomes = [(1, genome)]
 
     # Call game with only the loaded genome
-    run_genomes(genomes, config)
+    main_menu(genomes, config)
 
 if __name__ == "__main__": 
     local_dir = os.path.dirname(__file__)
