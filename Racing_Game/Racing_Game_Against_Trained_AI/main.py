@@ -125,7 +125,6 @@ class PlayerCar(AbstractCar):
             self.velocity = max(self.velocity+self.acceleration*2, -self.max_velocity)
         else: 
             self.velocity = max(self.velocity - self.acceleration/2, 0)
-        print(self.velocity)
         self.move()
 
     def bounce(self): 
@@ -160,13 +159,6 @@ class AICar(AbstractCar):
             self.angle += self.rot_velocity/2
         elif right: 
             self.angle -= self.rot_velocity
-
-    def bounce(self): 
-        if self.velocity <= 0: 
-            self.velocity = 2
-        else: 
-            self.velocity = -2
-        self.move()
     
     def radar_forward(self, angle, window): 
         length = 0
@@ -276,14 +268,14 @@ class GameInfo:
             return round(time.time() - self.level_start_time)
 
 
-'''Functions'''
+'''Helper Functions'''
 def draw(window, images, ai_car, player_car=None, ): 
     for image, position in images:
         window.blit(image, position)
 
     if player_car is not None: 
         player_car.draw(window)
-        velocity_text = BODY_FONT.render(f"Speed: {round(player_car.velocity, 1)}px/s", 1, (0, 0, 0))
+        velocity_text = BODY_FONT.render(f"Speed: {round(player_car.velocity*20, 1)}mph", 1, (0, 0, 0))
         window.blit(velocity_text, (window.get_width()-window.get_width()/4.7, window.get_height() - velocity_text.get_height()-10))
     
     ai_car.draw(window)
@@ -292,6 +284,7 @@ def draw(window, images, ai_car, player_car=None, ):
 def move_player(player_car): 
     keys = pygame.key.get_pressed()
     moved = False
+    '''User Controls of Car'''
     if player_car.time_since_bounce > 10:
         if keys[pygame.K_LEFT] and player_car.velocity >0: 
             player_car.rotate(left=True)
@@ -303,13 +296,16 @@ def move_player(player_car):
         if keys[pygame.K_DOWN]: 
             moved = True
             player_car.move_backward()
-
+    '''Reduce Car Speed Gradually if not accelerating'''
     if not moved: 
         player_car.reduce_speed()
 
+
+'''Main Game Functions'''
 def run_main_menu(genomes, config): 
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(MAIN_MENU, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
     pygame.display.update()
     pygame.time.wait(500)
@@ -323,7 +319,7 @@ def run_main_menu(genomes, config):
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a: 
                     print(pygame.mouse.get_pos())
-        
+        '''Menu Options'''
         mouse = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:  
             if 196 <= mouse[0] <= 279 and 449<= mouse[1] <=483:  
@@ -360,7 +356,6 @@ def run_setup(genomes, config, difficulty):
 
     run_countdown(genomes, config, game_info, player_car, ai_car, net)
 
-
 def run_countdown(genomes, config, game_info, player_car, ai_car, net): 
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: 
@@ -373,36 +368,39 @@ def run_countdown(genomes, config, game_info, player_car, ai_car, net):
 
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(COUNTDOWN_3, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
     pygame.display.update()
     pygame.time.wait(1000)
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(COUNTDOWN_2, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6))
     pygame.display.update()
     pygame.time.wait(1000)
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(COUNTDOWN_1, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6))
     pygame.display.update()
     pygame.time.wait(1000)
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(COUNTDOWN_GO, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
     pygame.display.update()
     pygame.time.wait(200)
     run_game(genomes, config, game_info, player_car, ai_car, net)
 
-
 def run_game(genomes, config, game_info, player_car, ai_car, net):
     '''Game Clock'''
-    #Makes sure clock is consistent. Ticks FPS times per second
     clock = pygame.time.Clock()
     FPS = 60
 
     '''Game Loop'''
     game = True
     while game: 
+        #Makes sure clock is consistent. Ticks FPS times per second
         clock.tick(FPS) 
 
         '''Update Screen'''
@@ -479,6 +477,7 @@ def run_game(genomes, config, game_info, player_car, ai_car, net):
 def run_lose_screen(genomes, config, game_info, player_car, ai_car, net): 
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(LOSE_SCREEN, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
     pygame.display.update()
     lose_screen = True
@@ -491,7 +490,7 @@ def run_lose_screen(genomes, config, game_info, player_car, ai_car, net):
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a: 
                     print(pygame.mouse.get_pos())
-        
+        '''Lose Screen Options'''
         mouse = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:  
             if 228 <= mouse[0] <= 312 and 449<= mouse[1] <=483:
@@ -510,6 +509,7 @@ def run_lose_screen(genomes, config, game_info, player_car, ai_car, net):
 def run_win_screen(genomes, config, game_info, player_car, ai_car, net):
     WINDOW.blit(GRASS, (0,0))
     WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(FINISH_LINE, (FINISH_LINE_POSITION))
     WINDOW.blit(WIN_SCREEN, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
     pygame.display.update()
     win_screen = True
@@ -522,7 +522,7 @@ def run_win_screen(genomes, config, game_info, player_car, ai_car, net):
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a: 
                     print(pygame.mouse.get_pos())
-        
+        '''Win Screen Options'''
         mouse = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:  
             if 196 <= mouse[0] <= 279 and 449<= mouse[1] <=483:
@@ -566,6 +566,5 @@ def play_game(config_path, genome_path="Prev_Winners/20_92__5_2_0042.pkl"):
 
 if __name__ == "__main__": 
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "feed_forward_config.txt")
-    # run(config_path) 
+    config_path = os.path.join(local_dir, "feed_forward_config.txt") 
     play_game(config_path)
