@@ -1,3 +1,4 @@
+from lib2to3 import pygram
 import neat
 import pygame
 import time
@@ -9,7 +10,7 @@ pygame.font.init()
 
 
 '''Track Background Images'''
-GRASS = scale_image(pygame.image.load("images/grass.jpg"), 1.7)
+GRASS = scale_image(pygame.image.load("images/grass.jpg"), 1.8)
 TRACK = pygame.image.load("images/my_track.png")
 TRACK_BORDER = pygame.image.load("images/my_track_border.png")
 
@@ -17,6 +18,7 @@ FINISH_LINE = pygame.image.load("images/finish_line.png")
 FINISH_LINE_POSITION = (37, 300)
 bg_images = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH_LINE, FINISH_LINE_POSITION)]
 
+MAIN_MENU = pygame.image.load("images/main_menu.png")
 
 '''Masks for Pixel Perfect Collisions'''
 FINISH_LINE_MASK = pygame.mask.from_surface(FINISH_LINE)
@@ -303,6 +305,30 @@ def run_genomes(genomes, config):
     run = True
     time_since_bounce = 0
 
+    '''Start Menu'''
+    WINDOW.blit(GRASS, (0,0))
+    WINDOW.blit(TRACK, (0,0))
+    WINDOW.blit(MAIN_MENU, (WIDTH/2-WIDTH/4, HEIGHT/2-HEIGHT/6)) 
+    pygame.display.update()
+    run_menu = True
+    while run_menu: 
+        for event in pygame.event.get(): 
+            if event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_q:
+                    run_menu = False
+                    break
+                elif event.key == pygame.K_a: 
+                    print(pygame.mouse.get_pos())
+        
+        mouse = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:  
+            if 196 <= mouse[0] <= 279 and 449<= mouse[1] <=483:
+                print("Easy")     
+            elif 312 <= mouse[0] <= 396 and 449<= mouse[1] <=483:
+                print("Medium")
+            elif 426 <= mouse[0] <= 510 and 449<= mouse[1] <=483:
+                print("Hard")
+    
     '''Main Game / Event Loop'''
     while run:
         '''Game Clock'''
