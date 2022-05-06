@@ -7,5 +7,4 @@ ports:
   onOpen: open-preview
 tasks:
 - init: pip3 install -r requirements.txt
-# - command: cd Racing_Game/Racing_Game_Against_Trained_AI
-- command: python Racing_Game/Racing_Game_Against_Trained_AI/main.py
+  command: python Racing_Game/Racing_Game_Against_Trained_AI/main.py
