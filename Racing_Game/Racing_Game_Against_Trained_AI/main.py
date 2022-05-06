@@ -183,7 +183,7 @@ class AICar(AbstractCar):
         
 class GameInfo: 
     def __init__(self, difficulty):
-        self.max_level = 4
+        self.levels = 4
         self.level = 0
         self.difficulty = difficulty
 
