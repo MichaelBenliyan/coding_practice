@@ -260,6 +260,7 @@ def run_main_menu(genomes, config):
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_a: 
                     print(pygame.mouse.get_pos())
+                    run_end_screen(genomes, config)
 
         '''Menu Options'''
         mouse = pygame.mouse.get_pos()
