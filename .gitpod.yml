@@ -6,5 +6,8 @@ ports:
 - port: 6080
   onOpen: open-preview
 tasks:
-- init: pip3 install -r requirements.txt
+- command: >
+    pip3 install -r requirements.txt && 
+    gp sync-done install
+- init: gp sync-await install
   command: python Racing_Game/Racing_Game_Against_Trained_AI/main.py
