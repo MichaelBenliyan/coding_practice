@@ -9,8 +9,6 @@ tasks:
 - command: >
     pip3 install -r requirements.txt && 
     gp sync-done install
-  openMode: split-right
 - command: >
     gp sync-await install &&
     python Racing_Game/Racing_Game_Against_Trained_AI/main.py
-  openMode: split-right
