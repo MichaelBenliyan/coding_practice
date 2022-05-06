@@ -6,7 +6,8 @@ ports:
 - port: 6080
   onOpen: open-preview
 tasks:
-- command: >
+- openMode: split-right
+  command: >
     pip3 install -r requirements.txt && 
     gp sync-done install
 - command: >
