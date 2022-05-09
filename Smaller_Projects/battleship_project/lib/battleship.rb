@@ -7,11 +7,15 @@ class Battleship
         @player = Player.new
         @board = Board.new(n)
         @remaining_misses = n * n / 2
+        @number_of_ships = n/2
     end
 
     def start_game
         @board.place_random_ships
-        puts @board.num_ships
+        print "Number of ships: "
+        print @number_of_ships
+        puts
+        # puts @board.num_ships
         @board.print
     end
 
@@ -50,7 +54,9 @@ class Battleship
             @remaining_misses -= 1
         end
         @board.print
-        puts @remaining_misses
+        print "Remaining Attempts: " 
+        print @remaining_misses
+        puts
     end
 
 end

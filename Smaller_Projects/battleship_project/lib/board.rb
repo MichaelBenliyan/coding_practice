@@ -1,8 +1,8 @@
-require "byebug"
+# require "byebug"
 class Board
     attr_reader :size, :grid
     def initialize(number)
-        @grid = Array.new(number) {Array.new(number, :N)}
+        @grid = Array.new(number) {Array.new(number, "?")}
         @size = number * number
         @number = number
     end
@@ -56,7 +56,7 @@ class Board
             # end
             return true
         else
-            self[position] = :X 
+            self[position] = "-" 
             return false
         end
     end
@@ -77,7 +77,7 @@ class Board
             end
             hash.each { |pos, v| boat_placer(pos, v) }
         end
-        puts hash.keys
+        # puts hash.keys
     end
 
     def boat_placer(pos, array)
@@ -111,7 +111,7 @@ class Board
         dup_grid.each do |array|
             array.each.with_index do |ele, i| 
                 if ele == :S
-                    array[i] = :N
+                    array[i] = "?"
                 end
             end
         end
@@ -139,10 +139,10 @@ class Board
         check_list = []
         if direction == 1 #down
             (0..(ship_length-1)).each { |i| check_list << [row + i, column]}
-            return check_list.all? { |pos| self[pos] == :N}
+            return check_list.all? { |pos| self[pos] == "?"}
         elsif direction == 2 #right
             (0..(ship_length-1)).each { |i| check_list << [row, column + i]}
-            return check_list.all? { |pos| self[pos] == :N}
+            return check_list.all? { |pos| self[pos] == "?"}
         end
         false
     end
@@ -166,7 +166,7 @@ class Board
                 check_list << [r+i, c]
                 i += ship_length
             end
-            return check_list.all? { |pos| self[pos] == :N || self[pos] == nil}
+            return check_list.all? { |pos| self[pos] == "?" || self[pos] == nil}
         elsif direction == 2 # right
             r = row 
             c = column - 1 
@@ -183,7 +183,7 @@ class Board
                 check_list << [r+i, c]
                 i += ship_length
             end
-            return check_list.all? { |pos| self[pos] == :N || self[pos] == nil}
+            return check_list.all? { |pos| self[pos] == "?" || self[pos] == nil}
         end
     end
 end
