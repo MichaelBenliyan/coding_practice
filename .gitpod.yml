@@ -1,9 +1,9 @@
 image:
   file: .gitpod.Dockerfile
 ports: 
-- port: 8000
-  name: Shared Music Rooms
-  onOpen: open-preview
+# - port: 8000
+#   name: Shared Music Rooms
+#   onOpen: open-preview
 - port: 5900
   onOpen: ignore
 - port: 6080
@@ -22,4 +22,4 @@ tasks:
     pip install djangorestframework
     pip install sqlalchemy &&
     pip install html5lib
-  command: python ./manage.py runserver
+  command: python ./Shared_Music_Rooms/manage.py runserver
