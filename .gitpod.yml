@@ -1,13 +1,9 @@
 image:
   file: .gitpod.Dockerfile
 ports: 
-# - port: 8000
-#   name: Shared Music Rooms
-#   onOpen: open-preview
 - port: 5900
   onOpen: ignore
 - port: 6080
-  name: Racing Game
   onOpen: open-preview
 tasks:
 - command: >
@@ -16,12 +12,3 @@ tasks:
 - command: >
     gp sync-await install &&
     python Racing_Game/Racing_Game_Against_Trained_AI/main.py
-- command: >
-    npm install &&
-    pip install django && 
-    pip install djangorestframework
-    pip install sqlalchemy &&
-    pip install html5lib &&
-    gp sync-done music_room &&
-    gp sync-await music_room &&
-    python ./Shared_Music_Rooms/manage.py runserver
