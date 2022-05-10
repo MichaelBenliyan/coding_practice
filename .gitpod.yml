@@ -1,9 +1,13 @@
 image:
   file: .gitpod.Dockerfile
 ports: 
+- port: 8000
+  name: Shared Music Rooms
+  onOpen: open-preview
 - port: 5900
   onOpen: ignore
 - port: 6080
+  name: Racing Game
   onOpen: open-preview
 tasks:
 - command: >
