@@ -16,3 +16,10 @@ tasks:
 - command: >
     gp sync-await install &&
     python Racing_Game/Racing_Game_Against_Trained_AI/main.py
+- init: >
+    npm install &&
+    pip install django && 
+    pip install djangorestframework
+    pip install sqlalchemy &&
+    pip install html5lib
+  command: python ./manage.py runserver
